@@ -3,16 +3,19 @@ pipeline {
     stages {
         stage('Source code scanning') {
             steps {
+                echo 'source code scan'
                 sh 'python source_code_scan.py --input-dir src --output-file source_code_scan_results.json'
             }
         }
         stage('Dependency scanning') {
             steps {
+                echo 'Dependency scann'
                 sh 'python dependency_scan.py --input-file requirements.txt --output-file dependency_scan_results.json'
             }
         }
         stage('Build Container Image') {
             steps {
+                echo 'build container'
                 // Build the container image and tag it with the commit hash
                 sh "docker build -t myapp:${env.GIT_COMMIT} ."
             }
@@ -20,6 +23,8 @@ pipeline {
 
         stage('Scan Container Image') {
             steps {
+                
+                echo 'image scan python script'
                 // Run the container image scanning script and save the results to a file
                 sh "python container_image_scanning.py --image-name myapp:${env.GIT_COMMIT} --output-file scan_results.json"
 
@@ -43,6 +48,7 @@ pipeline {
 
         stage('Deploy Container Image') {
             steps {
+                echo 'deploy'
                 // Deploy the container image to a Kubernetes cluster
                 sh "kubectl apply -f deployment.yaml"
             }
