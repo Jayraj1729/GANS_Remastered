@@ -12,3 +12,6 @@ for cellObj in list(sheet.columns)[0]:
     os.system("grype %s >result/%s.txt"% (cellObj.value, cellObj.value.replace("/","_")))
     os.system("docker rmi %s"%cellObj.value.replace("/", "_"))
    #print(cellObj.value)
+
+
+print(check for change.)
