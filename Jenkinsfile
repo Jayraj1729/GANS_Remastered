@@ -11,9 +11,40 @@ pipeline {
                 sh 'python dependency_scan.py --input-file requirements.txt --output-file dependency_scan_results.json'
             }
         }
-        stage('Container image scanning') {
+        stage('Build Container Image') {
             steps {
-                sh 'docker run -v $(pwd)/container_images:/images vulnerability_scanner:latest --image mycontainer:latest --output-file container_image_scan_results.json'
+                // Build the container image and tag it with the commit hash
+                sh "docker build -t myapp:${env.GIT_COMMIT} ."
+            }
+        }
+
+        stage('Scan Container Image') {
+            steps {
+                // Run the container image scanning script and save the results to a file
+                sh "python container_image_scanning.py --image-name myapp:${env.GIT_COMMIT} --output-file scan_results.json"
+
+                // Parse the scan results and print them to the console
+                script {
+                    def results = readJSON(file: 'scan_results.json')
+                    println results
+                }
+
+                // Fail the build if the scan results contain critical vulnerabilities
+                script {
+                    def results = readJSON(file: 'scan_results.json')
+                    def vulnerabilities = results.get('vulnerabilities', [])
+                    def critical_vulnerabilities = vulnerabilities.findAll { it.severity == 'HIGH' || it.severity == 'CRITICAL' }
+                    if (critical_vulnerabilities.size() > 0) {
+                        error 'Critical vulnerabilities found in container image'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Container Image') {
+            steps {
+                // Deploy the container image to a Kubernetes cluster
+                sh "kubectl apply -f deployment.yaml"
             }
         }
     }
