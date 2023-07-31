@@ -7,7 +7,7 @@ def scan_source_code(input_dir, output_file):
     command = ['source_code_scanner_tool', '--input-dir', input_dir, '--output-file', output_file]
     result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    # Check the result of the scan and return an appropriate exit code
+    # Check the result of the scan and return an appropriate exit code new edit
     if result.returncode == 0:
         return 0
     else:
