@@ -20,7 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('--output-file', type=str, help='File where the scan results will be saved')
     args = parser.parse_args()
 
-    # Run the source code scanner tool and save the results to a file
+    # Run the source code scanner tool and save the results to a file.
     exit_code = scan_source_code(args.input_dir, args.output_file)
     with open(args.output_file, 'r') as f:
         scan_results = json.load(f)
